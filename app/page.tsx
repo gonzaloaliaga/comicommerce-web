@@ -115,11 +115,11 @@ export default function Home() {
                   >
                     <Link
                       href={`/productDetails?id=${product.id}`}
-                      aria-label={product.name}
+                      aria-label={product.nombre}
                     >
                       <Image
                         src={product.img}
-                        alt={product.name}
+                        alt={product.nombre}
                         fill
                         style={{ objectFit: "contain" }} // cambiar a "cover" si quieres recortar
                         priority
@@ -134,12 +134,12 @@ export default function Home() {
                       href={`/productDetails?id=${product.id}`}
                       className="text-decoration-none fw-semibold d-block mb-2 text-dark"
                     >
-                      {product.name}
+                      {product.nombre}
                     </Link>
                   </div>
 
                   <div>
-                    <p className="text-muted mb-0">{product.price}</p>
+                    <p className="text-muted mb-0">{product.precio}</p>
                   </div>
                 </div>
               </div>
