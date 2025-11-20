@@ -87,7 +87,7 @@ export default function ProductDetailsContent() {
           <div className="col-md-6 d-flex justify-content-center align-items-center">
             <Image
               src={producto.img}
-              alt={producto.name}
+              alt={producto.nombre}
               width={500}
               height={500}
               className="img-fluid rounded"
@@ -95,8 +95,8 @@ export default function ProductDetailsContent() {
             />
           </div>
           <div className="col-md-6">
-            <h2>{producto.name}</h2>
-            <p className="fw-bold">{producto.price}</p>
+            <h2>{producto.nombre}</h2>
+            <p className="fw-bold">{producto.precio}</p>
             <p>{producto.descripcion}</p>
             <p className="text-muted">Categoría: {producto.categoria}</p>
             <button className="btn btn-primary mt-3" onClick={agregarAlCarrito}>

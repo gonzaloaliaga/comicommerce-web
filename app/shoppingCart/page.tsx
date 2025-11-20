@@ -118,7 +118,7 @@ export default function ShoppingCartPage() {
   // Calcular total
   const computeTotal = (): number => {
     return cartDetails.reduce((acc, it) => {
-      const price = it.product ? parsePrice(it.product.price) : 0;
+      const price = it.product ? parsePrice(it.product.precio) : 0;
       return acc + price * it.cantidad;
     }, 0);
   };
@@ -170,7 +170,7 @@ export default function ShoppingCartPage() {
                       {item.product ? (
                         <Image
                           src={item.product.img}
-                          alt={item.product.name}
+                          alt={item.product.nombre}
                           width={100}
                           height={120}
                           style={{ objectFit: "contain" }}
@@ -187,7 +187,7 @@ export default function ShoppingCartPage() {
                     <div className="flex-grow-1">
                       <h5 className="mb-1">
                         {item.product
-                          ? item.product.name
+                          ? item.product.nombre
                           : "Producto no disponible"}
                       </h5>
                       <p className="mb-1 text-muted">
@@ -195,7 +195,7 @@ export default function ShoppingCartPage() {
                       </p>
                       <p className="mb-1">
                         {item.product
-                          ? formatPrice(parsePrice(item.product.price))
+                          ? formatPrice(parsePrice(item.product.precio))
                           : ""}
                       </p>
                       <div className="d-flex align-items-center gap-2 mt-2">
@@ -225,7 +225,7 @@ export default function ShoppingCartPage() {
                     <div style={{ width: 140 }} className="text-end">
                       <div className="fw-bold">
                         {formatPrice(
-                          (item.product ? parsePrice(item.product.price) : 0) *
+                          (item.product ? parsePrice(item.product.precio) : 0) *
                             item.cantidad
                         )}
                       </div>

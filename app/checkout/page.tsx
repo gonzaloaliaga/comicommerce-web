@@ -78,7 +78,7 @@ export default function CheckoutPage() {
   // Cálculos
   const computeSubtotal = () => {
     return cartDetails.reduce((acc, it) => {
-      const price = it.product ? parsePrice(it.product.price) : 0;
+      const price = it.product ? parsePrice(it.product.precio) : 0;
       return acc + price * it.cantidad;
     }, 0);
   };
@@ -340,11 +340,11 @@ export default function CheckoutPage() {
                     className="d-flex justify-content-between mb-2"
                   >
                     <small>
-                      {item.product.name} (x{item.cantidad})
+                      {item.product.nombre} (x{item.cantidad})
                     </small>
                     <small>
                       {formatPrice(
-                        parsePrice(item.product.price) * item.cantidad
+                        parsePrice(item.product.precio) * item.cantidad
                       )}
                     </small>
                   </div>
