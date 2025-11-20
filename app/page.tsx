@@ -10,6 +10,8 @@ import Footer from "./components/footer";
 
 // Importación de type product para usar API PROPIA
 import { Product } from "../app/components/types";
+// Importación de
+import { getProducts } from "../app/api/api";
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -21,17 +23,13 @@ export default function Home() {
     // Print url de la api con mongodb
     console.log("Backend URL =>", process.env.NEXT_PUBLIC_API_URL);
 
-    // Fetch a la API
-    fetch("/api/products")
-      .then((res) => res.json())
+    // Obtener productos desde backend
+    getProducts()
       .then((data: Product[]) => {
-        // Mezclar los productos
+        if (!data) return;
+
         const productosAleatorios = data.sort(() => Math.random() - 0.5);
-
-        // Tomar los primeros 8
         const primerosOcho = productosAleatorios.slice(0, 8);
-
-        // Guardar en el estado
         setProducts(primerosOcho);
       })
       .catch((err) => console.error("Error fetching products:", err));
