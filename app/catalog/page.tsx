@@ -5,10 +5,7 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import Link from "next/link";
 import Image from "next/image";
-
-// Importación de type product para usar API PROPIA
 import { Product } from "../components/types";
-// Importación de
 import { getProducts } from "../api/api";
 
 export default function Catalogo() {
@@ -24,9 +21,17 @@ export default function Catalogo() {
       setProducts(data);
 
       const cats = Array.from(new Set(data.map((p) => p.categoria)));
-      setCategorias(["Todas", ...cats]);
+      setCategorias(cats);
     });
   }, []);
+
+  const formatoPrecio = (valor: number) => {
+    return valor.toLocaleString("es-CL", {
+      style: "currency",
+      currency: "CLP",
+      minimumFractionDigits: 0,
+    });
+  };
 
   const productosFiltrados =
     categoriaSeleccionada === "Todas"
@@ -41,7 +46,6 @@ export default function Catalogo() {
       <Header />
 
       <main className="flex-grow-1 container mt-4">
-        {/* Selector de categoría */}
         <div className="d-flex justify-content-center mb-4">
           <div className="col-12 col-md-6">
             <select
@@ -59,7 +63,6 @@ export default function Catalogo() {
           </div>
         </div>
 
-        {/* Catálogo */}
         {categoriasMostrar.map((categoria) => (
           <section key={categoria} className="mb-5">
             <h2 className="mb-4 border-bottom pb-2 text-center">{categoria}</h2>
@@ -73,10 +76,9 @@ export default function Catalogo() {
                       className="card h-100 text-center shadow-sm border-0 d-flex flex-column"
                       style={{ height: "500px" }}
                     >
-                      {/* CONTENEDOR FIJO 250x250 */}
                       <div
                         style={{
-                          width: "100%", // full width column
+                          width: "100%",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
@@ -84,18 +86,16 @@ export default function Catalogo() {
                           paddingBottom: "0.5rem",
                         }}
                       >
-                        {/* caja centrada de tamaño fijo (250x250) */}
                         <div
                           style={{
                             width: 250,
                             height: 250,
-                            position: "relative", // necesario para next/image fill
+                            position: "relative",
                             overflow: "hidden",
                             background: "white",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            boxSizing: "border-box",
                           }}
                         >
                           <Link
@@ -105,27 +105,25 @@ export default function Catalogo() {
                             <Image
                               src={product.img}
                               alt={product.nombre}
-                              fill // importante: ocupa el contenedor
-                              style={{ objectFit: "contain" }} // contain -> no corta y mantiene proporción
+                              fill
+                              style={{ objectFit: "contain" }}
                               priority
                             />
                           </Link>
                         </div>
                       </div>
 
-                      {/* Información */}
                       <div className="card-body d-flex flex-column justify-content-between mt-auto">
-                        <div>
-                          <Link
-                            href={`/productDetails?id=${product.id}`}
-                            className="text-decoration-none fw-semibold d-block mb-1 text-dark"
-                          >
-                            {product.nombre}
-                          </Link>
-                        </div>
-                        <div>
-                          <p className="mb-2">{product.precio}</p>
-                        </div>
+                        <Link
+                          href={`/productDetails?id=${product.id}`}
+                          className="text-decoration-none fw-semibold d-block mb-1 text-dark"
+                        >
+                          {product.nombre}
+                        </Link>
+
+                        <p className="mb-2 fw-bold text-success">
+                          {formatoPrecio(Number(product.precio))}
+                        </p>
                       </div>
                     </div>
                   </div>
