@@ -6,13 +6,10 @@ import Footer from "../components/footer";
 import Link from "next/link";
 import Image from "next/image";
 
-type Product = {
-  id: number;
-  img: string;
-  name: string;
-  price: string;
-  categoria: string;
-};
+// Importación de type product para usar API PROPIA
+import { Product } from "../components/types";
+// Importación de
+import { getProducts } from "../api/api";
 
 export default function Catalogo() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -21,14 +18,14 @@ export default function Catalogo() {
     useState<string>("Todas");
 
   useEffect(() => {
-    fetch("/api/products")
-      .then((res) => res.json())
-      .then((data: Product[]) => {
-        setProducts(data);
-        const cats = Array.from(new Set(data.map((p) => p.categoria)));
-        setCategorias(cats);
-      })
-      .catch((err) => console.error("Error fetching products:", err));
+    getProducts().then((data: Product[] | null) => {
+      if (!data) return;
+
+      setProducts(data);
+
+      const cats = Array.from(new Set(data.map((p) => p.categoria)));
+      setCategorias(["Todas", ...cats]);
+    });
   }, []);
 
   const productosFiltrados =
@@ -103,11 +100,11 @@ export default function Catalogo() {
                         >
                           <Link
                             href={`/productDetails?id=${product.id}`}
-                            aria-label={product.name}
+                            aria-label={product.nombre}
                           >
                             <Image
                               src={product.img}
-                              alt={product.name}
+                              alt={product.nombre}
                               fill // importante: ocupa el contenedor
                               style={{ objectFit: "contain" }} // contain -> no corta y mantiene proporción
                               priority
@@ -123,11 +120,11 @@ export default function Catalogo() {
                             href={`/productDetails?id=${product.id}`}
                             className="text-decoration-none fw-semibold d-block mb-1 text-dark"
                           >
-                            {product.name}
+                            {product.nombre}
                           </Link>
                         </div>
                         <div>
-                          <p className="mb-2">{product.price}</p>
+                          <p className="mb-2">{product.precio}</p>
                         </div>
                       </div>
                     </div>
