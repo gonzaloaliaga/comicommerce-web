@@ -23,15 +23,13 @@ export default function ProductDetailsContent() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
 
   useEffect(() => {
-    if (!idParam || isNaN(Number(idParam))) {
+    if (!idParam) {
       setError("ID de producto inválido");
       setCargando(false);
       return;
     }
 
-    const id = Number(idParam);
-
-    getProductById(id)
+    getProductById(idParam)
       .then((data: Product | null) => {
         if (!data) {
           setError("Producto no encontrado");
