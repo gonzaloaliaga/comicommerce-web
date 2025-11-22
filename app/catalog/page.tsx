@@ -7,6 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Product } from "../components/types";
 import { getProducts } from "../api/api";
+import Price from "../components/precio";
 
 export default function Catalogo() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -24,14 +25,6 @@ export default function Catalogo() {
       setCategorias(cats);
     });
   }, []);
-
-  const formatoPrecio = (valor: number) => {
-    return valor.toLocaleString("es-CL", {
-      style: "currency",
-      currency: "CLP",
-      minimumFractionDigits: 0,
-    });
-  };
 
   const productosFiltrados =
     categoriaSeleccionada === "Todas"
@@ -121,8 +114,8 @@ export default function Catalogo() {
                           {product.nombre}
                         </Link>
 
-                        <p className="text-dark mb-0 fw-bold">
-                          {formatoPrecio(Number(product.precio))}
+                        <p className="fw-bold">
+                          <Price value={product.precio} />
                         </p>
                       </div>
                     </div>

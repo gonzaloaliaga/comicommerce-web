@@ -7,22 +7,11 @@ import "bootstrap/dist/css/bootstrap.min.css";
 // Elementos personalizados
 import Header from "./components/header";
 import Footer from "./components/footer";
+import Price from "./components/precio";
 
 // Importación de type product para usar API PROPIA
 import { Product } from "../app/components/types";
 import { getProducts } from "../app/api/api";
-
-// Función para formatear precio CLP
-const formatoPrecio = (valor: number | string) => {
-  const num = typeof valor === "string" ? Number(valor) : valor;
-  if (isNaN(num)) return valor;
-
-  return num.toLocaleString("es-CL", {
-    style: "currency",
-    currency: "CLP",
-    minimumFractionDigits: 0,
-  });
-};
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -147,8 +136,8 @@ export default function Home() {
                   </div>
 
                   <div>
-                    <p className="text-dark mb-0 fw-bold">
-                      {formatoPrecio(product.precio)}
+                    <p className="fw-bold">
+                      <Price value={product.precio} />
                     </p>
                   </div>
                 </div>

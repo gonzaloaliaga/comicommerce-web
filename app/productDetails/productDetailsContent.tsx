@@ -7,6 +7,7 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import Image from "next/image";
 import router from "next/router";
+import Price from "../components/precio";
 
 // API MONGO
 import { getProductById } from "../api/api";
@@ -101,7 +102,9 @@ export default function ProductDetailsContent() {
           </div>
           <div className="col-md-6">
             <h2>{producto.nombre}</h2>
-            <p className="fw-bold">{producto.precio}</p>
+            <p className="fw-bold">
+              <Price value={producto.precio} />
+            </p>
             <p>{producto.descripcion}</p>
             <p className="text-muted">Categoría: {producto.categoria}</p>
             <button className="btn btn-primary mt-3" onClick={agregarAlCarrito}>
