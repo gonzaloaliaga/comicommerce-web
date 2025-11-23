@@ -6,7 +6,7 @@ import Link from "next/link";
 import Header from "../components/header";
 import Footer from "../components/footer";
 
-import { Usuario } from "../components/types";
+import { loginUser } from "../api/api";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -14,28 +14,21 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!correo || !password) {
       setError("Por favor completa todos los campos.");
       return;
     }
-    const usuarios: Usuario[] = JSON.parse(
-      localStorage.getItem("usuarios") || "[]"
-    );
-    // Buscar usuario por correo
-    const usuarioPorCorreo = usuarios.find((u: Usuario) => u.correo === correo);
-    if (!usuarioPorCorreo) {
-      setError("El correo no existe. Por favor regístrate primero.");
+
+    const usuarioLogueado = await loginUser(correo, password);
+
+    if (!usuarioLogueado) {
+      setError("Correo o contraseña incorrecta.");
       return;
     }
-    // Validar contraseña
-    if (usuarioPorCorreo.password !== password) {
-      setError("Contraseña incorrecta. Intenta nuevamente.");
-      return;
-    }
-    // Login exitoso
-    localStorage.setItem("usuarioLogueado", JSON.stringify(usuarioPorCorreo));
-    setError(""); // limpiar errores
+
+    localStorage.setItem("usuarioLogueado", JSON.stringify(usuarioLogueado));
+    setError("");
     router.push("/");
   };
 

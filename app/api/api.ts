@@ -36,3 +36,17 @@ export const postUser = async (user: Usuario) => {
     return null;
   }
 };
+
+export const loginUser = async (correo: string, password: string) => {
+  try {
+    const res = await fetch(
+      `${BASE_URL}/api/users/login?correo=${correo}&password=${password}`
+    );
+
+    if (!res.ok) throw new Error(`Error ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.error("Login error:", err);
+    return null;
+  }
+};
