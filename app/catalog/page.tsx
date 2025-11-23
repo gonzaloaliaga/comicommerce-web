@@ -15,6 +15,9 @@ export default function Catalogo() {
   const [categoriaSeleccionada, setCategoriaSeleccionada] =
     useState<string>("Todas");
 
+  // LOG DE TESTEO ********************************************
+  console.log("Productos cargados:", getProducts());
+
   useEffect(() => {
     getProducts().then((data: Product[] | null) => {
       if (!data) return;

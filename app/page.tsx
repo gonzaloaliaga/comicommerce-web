@@ -21,6 +21,8 @@ export default function Home() {
     import("bootstrap/dist/js/bootstrap.bundle.min.js");
 
     console.log("Backend URL =>", process.env.NEXT_PUBLIC_API_URL);
+    // LOG DE TESTEO ********************************************
+    console.log("Productos cargados:", getProducts());
 
     getProducts()
       .then((data: Product[]) => {
