@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Usuario, Product, CarritoItem } from "../components/types";
 import Header from "../components/header";
 import Footer from "../components/footer";
@@ -22,8 +22,8 @@ export default function ShoppingCartPage() {
   const [cartDetails, setCartDetails] = useState<CartDetail[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
 
-  // Cargar productos
-  const loadProducts = async () => {
+  // Cargar productos (useCallback evita recrear func en cada render)
+  const loadProducts = useCallback(async () => {
     try {
       const res = await fetch("/api/products");
       const data: Product[] = await res.json();
@@ -33,26 +33,30 @@ export default function ShoppingCartPage() {
     } finally {
       setLoadingProducts(false);
     }
-  };
+  }, []);
 
   // Cargar carrito real desde backend
-  const loadCarrito = async (usuarioId: string) => {
-    try {
-      const res = await fetch(`/api/carrito/${usuarioId}`);
-      const data = await res.json(); // Carrito con: items: [{productoId, cantidad}]
-      if (!data.items) return;
+  const loadCarrito = useCallback(
+    async (usuarioId: string) => {
+      try {
+        const res = await fetch(`/api/carrito/${usuarioId}`);
+        const data = await res.json();
+        if (!data.items) return;
 
-      const detail: CartDetail[] = data.items.map((ci: CarritoItem) => ({
-        productoId: ci.productoId,
-        cantidad: ci.cantidad,
-        product: products.find((p) => p._id === String(ci.productoId)) || null,
-      }));
+        const detail: CartDetail[] = data.items.map((ci: CarritoItem) => ({
+          productoId: ci.productoId,
+          cantidad: ci.cantidad,
+          product:
+            products.find((p) => p._id === String(ci.productoId)) || null,
+        }));
 
-      setCartDetails(detail);
-    } catch (err) {
-      console.error("Error cargando carrito", err);
-    }
-  };
+        setCartDetails(detail);
+      } catch (err) {
+        console.error("Error cargando carrito", err);
+      }
+    },
+    [products] // solo cambia cuando cambian los productos
+  );
 
   // Cargar usuario logueado
   useEffect(() => {
@@ -70,7 +74,7 @@ export default function ShoppingCartPage() {
     loadProducts();
   }, [loadCarrito, loadProducts]);
 
-  // Actualizar carrito cuando cambian productos
+  // Actualiza carrito cuando productos están listos
   useEffect(() => {
     if (usuario?._id && products.length > 0) {
       loadCarrito(usuario._id);
@@ -95,19 +99,15 @@ export default function ShoppingCartPage() {
     loadCarrito(usuario._id);
   };
 
-  const computeTotal = (): number => {
-    return cartDetails.reduce((acc, it) => {
+  const computeTotal = () =>
+    cartDetails.reduce((acc, it) => {
       const price = it.product ? parsePrice(it.product.precio) : 0;
       return acc + price * it.cantidad;
     }, 0);
-  };
 
   const handleCheckout = () => {
     if (!usuario) return router.push("/login");
-    if (!cartDetails.length) {
-      alert("Carrito vacío");
-      return;
-    }
+    if (!cartDetails.length) return alert("Carrito vacío");
     router.push("/checkout");
   };
 

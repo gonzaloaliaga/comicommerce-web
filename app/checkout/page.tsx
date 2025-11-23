@@ -64,7 +64,7 @@ export default function CheckoutPage() {
         return;
       }
 
-      let user: Usuario & { _id?: string; id?: string };
+      let user: Usuario & { _id?: string };
       try {
         user = JSON.parse(userJSON);
         setUsuario(user);
@@ -75,8 +75,7 @@ export default function CheckoutPage() {
         return;
       }
 
-      const userId = usuario?._id || "";
-      if (!userId) return router.push("/login");
+      const userId = user._id || "";
       if (!userId) {
         alert("Usuario sin identificador. Vuelve a iniciar sesión.");
         router.push("/login");
