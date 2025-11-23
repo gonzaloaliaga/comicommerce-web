@@ -1,65 +1,64 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Usuario } from "./types";
 
 export default function Header() {
   const [usuarioLogueado, setUsuarioLogueado] = useState<Usuario | null>(null);
   const [cantidadCarrito, setCantidadCarrito] = useState<number>(0);
 
-  // Función para actualizar desde localStorage
-  const updateFromStorage = () => {
-    const userData = localStorage.getItem("usuarioLogueado");
+  const fetchCarrito = async (usuarioId: string) => {
+    try {
+      const res = await fetch(
+        `https://mondongonzalo.up.railway.app/api/carrito/${usuarioId}`
+      );
+      const carrito = await res.json();
 
-    if (userData) {
-      try {
-        const usuario: Usuario = JSON.parse(userData);
-        setUsuarioLogueado(usuario);
+      const total = carrito.items?.reduce(
+        (acc: number, item: { cantidad: number }) => acc + item.cantidad,
+        0
+      );
 
-        // Calcular cantidad total de productos en el carrito
-        const total = (usuario.carrito ?? []).reduce(
-          (acc, item) => acc + (item.cantidad ?? 0),
-          0
-        );
-        setCantidadCarrito(total);
-      } catch {
-        console.error("Error al parsear usuarioLogueado");
-        setUsuarioLogueado(null);
-        setCantidadCarrito(0);
-      }
-    } else {
-      setUsuarioLogueado(null);
+      setCantidadCarrito(total || 0);
+    } catch (err) {
+      console.error("Error al obtener el carrito:", err);
       setCantidadCarrito(0);
     }
   };
 
+  const updateFromStorage = useCallback(() => {
+    const userData = localStorage.getItem("usuarioLogueado");
+
+    if (!userData) {
+      setUsuarioLogueado(null);
+      setCantidadCarrito(0);
+      return;
+    }
+
+    const usuario: Usuario = JSON.parse(userData);
+    setUsuarioLogueado(usuario);
+
+    if (usuario._id) fetchCarrito(usuario._id);
+  }, []);
+
   useEffect(() => {
     updateFromStorage();
 
-    // Escuchar cambios en localStorage o eventos personalizados
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === "usuarioLogueado" || e.key === null) updateFromStorage();
-    };
-
+    // Escuchar cambios del carrito y login
     const onCarritoUpdated = () => updateFromStorage();
-
-    window.addEventListener("storage", onStorage);
     window.addEventListener("carritoUpdated", onCarritoUpdated);
 
     return () => {
-      window.removeEventListener("storage", onStorage);
       window.removeEventListener("carritoUpdated", onCarritoUpdated);
     };
-  }, []);
+  }, [updateFromStorage]);
 
   const handleLogout = () => {
     if (!window.confirm("¿Estás seguro de que quieres cerrar sesión?")) return;
-
     localStorage.removeItem("usuarioLogueado");
     setUsuarioLogueado(null);
     setCantidadCarrito(0);
-    alert("Has cerrado sesión.");
     window.location.reload();
   };
 

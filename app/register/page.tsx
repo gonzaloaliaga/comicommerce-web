@@ -70,7 +70,6 @@ export default function RegisterPage() {
       telefono,
       region,
       comuna,
-      carrito: [],
     };
 
     const res = await postUser(nuevoUsuario);

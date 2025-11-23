@@ -11,6 +11,7 @@ import Price from "../components/precio";
 
 // API MONGO
 import { getProductById } from "../api/api";
+import { addToCart } from "../api/api";
 
 // Usamos el tipo `Usuario` y la forma de carrito { id, cantidad }
 
@@ -50,34 +51,30 @@ export default function ProductDetailsContent() {
     if (userLoggedJSON) setUsuario(JSON.parse(userLoggedJSON));
   }, []);
 
-  const agregarAlCarrito = () => {
+  const agregarAlCarrito = async () => {
     if (!usuario) {
       alert("Debes iniciar sesión para agregar productos al carrito");
       router.push("/login");
       return;
     }
 
-    const carritoActual = usuario.carrito || [];
-    const index = carritoActual.findIndex((item) => item.id === producto?.id);
+    if (!producto) return;
 
-    if (index >= 0) carritoActual[index].cantidad += 1;
-    else carritoActual.push({ id: producto!.id, cantidad: 1 });
+    if (!usuario?._id) {
+      alert("Debes iniciar sesión para agregar productos al carrito.");
+      return;
+    }
 
-    const nuevoUsuario: Usuario = { ...usuario, carrito: carritoActual };
-    setUsuario(nuevoUsuario);
-    localStorage.setItem("usuarioLogueado", JSON.stringify(nuevoUsuario));
+    const resultado = await addToCart(usuario._id, producto.id, 1);
 
-    const usuariosJSON = localStorage.getItem("usuarios");
-    let usuarios: Usuario[] = usuariosJSON ? JSON.parse(usuariosJSON) : [];
-    usuarios = usuarios.map((u) =>
-      u.correo === nuevoUsuario.correo ? nuevoUsuario : u
-    );
-    localStorage.setItem("usuarios", JSON.stringify(usuarios));
+    if (resultado) {
+      alert("Producto agregado al carrito");
 
-    // Notificar a otros componentes en la misma pestaña
-    window.dispatchEvent(new Event("carritoUpdated"));
-
-    alert("Producto agregado al carrito");
+      // Evento para actualizar el Header (cantidad)
+      window.dispatchEvent(new Event("carritoUpdated"));
+    } else {
+      alert("Error al agregar producto");
+    }
   };
 
   if (cargando) return <p className="text-center mt-4">Cargando producto...</p>;
