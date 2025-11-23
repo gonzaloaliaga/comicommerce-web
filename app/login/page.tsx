@@ -32,7 +32,7 @@ export default function LoginPage() {
       _id: usuarioLogueado._id ?? usuarioLogueado.id,
     };
 
-    localStorage.setItem("usuarioLogueado", JSON.stringify(usuarioLogueado));
+    localStorage.setItem("usuarioLogueado", JSON.stringify(normalizedUser));
     setError("");
     router.push("/");
   };
