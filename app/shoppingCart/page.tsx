@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { UsuarioMongo, ProductMongo, CarritoItem } from "../components/types";
+import { getCarritoByUser, addToCart, removeFromCart } from "../api/api";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import Image from "next/image";
@@ -35,13 +36,11 @@ export default function ShoppingCartPage() {
     }
   }, []);
 
-  // Cargar carrito real desde backend
   const loadCarrito = useCallback(
     async (usuarioId: string) => {
       try {
-        const res = await fetch(`/api/carrito/${usuarioId}`);
-        const data = await res.json();
-        if (!data.items) return;
+        const data = await getCarritoByUser(usuarioId);
+        if (!data?.items) return;
 
         const detail: CartDetail[] = data.items.map((ci: CarritoItem) => ({
           productoId: ci.productoId,
@@ -54,7 +53,7 @@ export default function ShoppingCartPage() {
         console.error("Error cargando carrito", err);
       }
     },
-    [products] // solo cambia cuando cambian los productos
+    [products]
   );
 
   // Cargar usuario logueado
@@ -80,21 +79,15 @@ export default function ShoppingCartPage() {
     }
   }, [usuario?.id, products, loadCarrito]);
 
-  // API: aumentar cantidad
   const increaseQty = async (productoId: string) => {
     if (!usuario) return router.push("/login");
-    await fetch(`/api/carrito/${usuario.id}/add/${productoId}`, {
-      method: "PUT",
-    });
+    await addToCart(usuario.id, productoId, 1);
     loadCarrito(usuario.id);
   };
 
-  // API: disminuir cantidad o eliminar
   const decreaseQty = async (productoId: string) => {
     if (!usuario) return router.push("/login");
-    await fetch(`/api/carrito/${usuario.id}/remove/${productoId}`, {
-      method: "PUT",
-    });
+    await removeFromCart(usuario.id, productoId);
     loadCarrito(usuario.id);
   };
 
