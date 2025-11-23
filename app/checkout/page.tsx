@@ -6,6 +6,7 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import { parsePrice, formatPrice } from "../../lib/price";
 import { useRouter } from "next/navigation";
+import { getCarritoByUser, vaciarCarrito, getProducts } from "../api/api";
 
 interface FormData {
   nombre: string;
@@ -84,17 +85,14 @@ export default function CheckoutPage() {
 
       try {
         setLoading(true);
-        const [carritoRes, productsRes] = await Promise.all([
-          fetch(`/api/carrito/${userId}`),
-          fetch("/api/products"),
+
+        // Usar métodos de API
+        const [carritoJson, productsJson] = await Promise.all([
+          getCarritoByUser(userId),
+          getProducts(),
         ]);
 
-        const carritoJson = carritoRes.ok
-          ? await carritoRes.json()
-          : { items: [] };
-        const productsJson = productsRes.ok ? await productsRes.json() : [];
-
-        setCarritoItems(carritoJson.items ?? []);
+        setCarritoItems(carritoJson?.items ?? []);
         setProducts(productsJson ?? []);
       } catch (err) {
         console.error("Error al cargar datos del checkout:", err);
@@ -204,14 +202,13 @@ export default function CheckoutPage() {
     }
 
     try {
-      const res = await fetch(`/api/carrito/${userId}`, { method: "DELETE" });
-      if (!res.ok) {
-        console.error("Error al vaciar carrito en backend:", await res.text());
+      const success = await vaciarCarrito(userId);
+      if (!success) {
         alert("Hubo un error al procesar el pedido. Intenta nuevamente.");
         return;
       }
 
-      // Notificar cambios (Header u otras páginas)
+      // Notificar cambios en Header u otras páginas
       window.dispatchEvent(new Event("carritoUpdated"));
 
       alert("¡Gracias por tu compra! Tu pedido ha sido procesado.");
