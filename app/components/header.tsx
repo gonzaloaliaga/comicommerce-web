@@ -13,8 +13,7 @@ export default function Header() {
 
   const fetchCarrito = async (usuarioId: string) => {
     try {
-      const res = await getCarritoByUser(usuarioId);
-      const carrito = await res.json();
+      const carrito = await getCarritoByUser(usuarioId);
 
       console.log(carrito); // LOG DE TESTEO
 
