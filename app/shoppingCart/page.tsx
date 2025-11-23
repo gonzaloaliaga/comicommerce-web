@@ -2,7 +2,12 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { UsuarioMongo, ProductMongo, CarritoItem } from "../components/types";
-import { getCarritoByUser, addToCart, removeFromCart } from "../api/api";
+import {
+  getCarritoByUser,
+  addToCart,
+  removeFromCart,
+  getProducts,
+} from "../api/api";
 import Header from "../components/header";
 import Footer from "../components/footer";
 import Image from "next/image";
@@ -26,10 +31,11 @@ export default function ShoppingCartPage() {
   // Cargar productos (useCallback evita recrear func en cada render)
   const loadProducts = useCallback(async () => {
     try {
-      const res = await fetch("/api/products");
-      const data: ProductMongo[] = await res.json();
+      // Llamada a la API usando tu método
+      const data: ProductMongo[] = await getProducts();
       setProducts(data);
-    } catch {
+    } catch (err) {
+      console.error("Error cargando productos", err);
       setProducts([]);
     } finally {
       setLoadingProducts(false);
