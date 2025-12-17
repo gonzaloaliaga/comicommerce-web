@@ -13,7 +13,7 @@ interface FormData {
   direccion: string;
   ciudad: string;
   telefono: string;
-  metodoPago: "tarjeta" | "mercadopago" | "transferencia";
+  metodoPago: "tarjeta" | "transferencia" | "mercadopago";
   cardNumber: string;
   expiry: string;
   cardName: string;
@@ -171,14 +171,11 @@ export default function CheckoutPage() {
       return;
     }
 
-    // --- INTEGRACIÓN MERCADO PAGO ---
     if (formData.metodoPago === "mercadopago") {
       try {
-        // Llamamos a la función para crear la preferencia
         const response = await createMercadoPagoPreference(carritoItems);
 
         if (response && response.init_point) {
-          // Redirigimos a Mercado Pago
           window.location.href = response.init_point;
         } else {
           alert("Error: El servidor no devolvió el link de pago.");
@@ -187,7 +184,7 @@ export default function CheckoutPage() {
         console.error(error);
         alert("Error al conectar con el servidor.");
       }
-      return; // Detenemos aquí para no procesar como orden local
+      return;
     }
 
     // Crear orden (localStorage, similar a tu flujo actual)
@@ -310,11 +307,9 @@ export default function CheckoutPage() {
                     value={formData.metodoPago}
                     onChange={handleInputChange}
                   >
-                    <option value="tarjeta">Tarjeta de crédito/débito</option>
-                    <option value="mercadopago">Mercado Pago</option>
-                    <option value="transferencia">
-                      Transferencia bancaria
-                    </option>
+                    <option value="tarjeta">Tarjeta de crédito/débito (Local)</option>
+                    <option value="transferencia">Transferencia bancaria</option>
+                    <option value="mercadopago">Mercado Pago (Web)</option>
                   </select>
                 </div>
 
