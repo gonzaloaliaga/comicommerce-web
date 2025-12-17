@@ -26,6 +26,8 @@ export default function Catalogo() {
     });
   }, []);
 
+  console.log(products)
+
   const productosFiltrados =
     categoriaSeleccionada === "Todas"
       ? products
