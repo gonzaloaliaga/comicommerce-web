@@ -114,6 +114,7 @@ export const vaciarCarrito = async (usuarioId: string) => {
 };
 
 // **************** MERCADO PAGO *******************
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const createMercadoPagoPreference = async (items: any[]) => {
   try {
     // Llamamos al endpoint que creó Gonzalo en el Backend
