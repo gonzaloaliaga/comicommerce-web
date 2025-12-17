@@ -6,7 +6,7 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import { parsePrice, formatPrice } from "../../lib/price";
 import { useRouter } from "next/navigation";
-import { getCarritoByUser, vaciarCarrito, getProducts } from "../api/api";
+import { getCarritoByUser, vaciarCarrito, getProducts, createMercadoPagoPreference } from "../api/api";
 
 interface FormData {
   nombre: string;
@@ -154,21 +154,32 @@ export default function CheckoutPage() {
     if (!/^\d{9}$/.test(formData.telefono))
       newErrors.telefono = "Ingrese un teléfono válido de 9 dígitos.";
 
-    if (formData.metodoPago === "tarjeta") {
-      if (!/^\d{16}$/.test(formData.cardNumber))
-        newErrors.cardNumber = "Ingrese 16 dígitos de la tarjeta.";
-      if (!/^(0[1-9]|1[0-2])\/?(\d{2}|\d{4})$/.test(formData.expiry))
-        newErrors.expiry = "Formato expiración MM/YY o MM/YYYY.";
-      if (!formData.cardName.trim())
-        newErrors.cardName = "Ingrese el nombre del titular.";
-      if (!/^\d{3}$/.test(formData.cvv))
-        newErrors.cvv = "Ingrese el CVV de 3 dígitos.";
-    }
+    // Eliminamos validación de tarjeta local porque usaremos Mercado Pago
+    // if (formData.metodoPago === "tarjeta") { ... }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
+    }
+
+    // --- INTEGRACIÓN MERCADO PAGO ---
+    if (formData.metodoPago === "tarjeta") {
+      try {
+        // Llamamos a la función para crear la preferencia
+        const response = await createMercadoPagoPreference(carritoItems);
+
+        if (response && response.init_point) {
+          // Redirigimos a Mercado Pago
+          window.location.href = response.init_point;
+        } else {
+          alert("Error: El servidor no devolvió el link de pago.");
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Error al conectar con el servidor.");
+      }
+      return; // Detenemos aquí para no procesar como orden local
     }
 
     // Crear orden (localStorage, similar a tu flujo actual)
@@ -299,91 +310,13 @@ export default function CheckoutPage() {
                 </div>
 
                 {formData.metodoPago === "tarjeta" && (
-                  <div className="mb-3 card p-3">
-                    <h6>Datos de la tarjeta</h6>
-                    <div className="mb-2">
-                      <label className="form-label">Número de tarjeta</label>
-                      <input
-                        type="text"
-                        className={`form-control ${
-                          errors.cardNumber ? "is-invalid" : ""
-                        }`}
-                        name="cardNumber"
-                        value={formData.cardNumber}
-                        onChange={handleInputChange}
-                        inputMode="numeric"
-                        required
-                      />
-                      {errors.cardNumber && (
-                        <div className="invalid-feedback">
-                          {errors.cardNumber}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="mb-2 d-flex gap-2">
-                      <div style={{ flex: 1 }}>
-                        <label className="form-label">Vencimiento</label>
-                        <input
-                          type="text"
-                          className={`form-control ${
-                            errors.expiry ? "is-invalid" : ""
-                          }`}
-                          name="expiry"
-                          value={formData.expiry}
-                          onChange={handleInputChange}
-                          placeholder="MM/YY"
-                          required
-                        />
-                        {errors.expiry && (
-                          <div className="invalid-feedback">
-                            {errors.expiry}
-                          </div>
-                        )}
-                      </div>
-
-                      <div style={{ flex: 1 }}>
-                        <label className="form-label">CVV</label>
-                        <input
-                          type="text"
-                          className={`form-control ${
-                            errors.cvv ? "is-invalid" : ""
-                          }`}
-                          name="cvv"
-                          value={formData.cvv}
-                          onChange={handleInputChange}
-                          placeholder="123"
-                          required
-                        />
-                        {errors.cvv && (
-                          <div className="invalid-feedback">{errors.cvv}</div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="mb-2">
-                      <label className="form-label">A nombre de</label>
-                      <input
-                        type="text"
-                        className={`form-control ${
-                          errors.cardName ? "is-invalid" : ""
-                        }`}
-                        name="cardName"
-                        value={formData.cardName}
-                        onChange={handleInputChange}
-                        required
-                      />
-                      {errors.cardName && (
-                        <div className="invalid-feedback">
-                          {errors.cardName}
-                        </div>
-                      )}
-                    </div>
+                  <div className="mb-3 alert alert-info">
+                    Serás redirigido a Mercado Pago para completar tu compra de forma segura.
                   </div>
                 )}
 
                 <button type="submit" className="btn btn-danger w-100">
-                  Confirmar pedido
+                  {formData.metodoPago === "tarjeta" ? "Ir a Pagar" : "Confirmar pedido"}
                 </button>
               </form>
             </div>

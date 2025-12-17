@@ -112,3 +112,25 @@ export const vaciarCarrito = async (usuarioId: string) => {
     return false;
   }
 };
+
+// **************** MERCADO PAGO *******************
+export const createMercadoPagoPreference = async (items: any[]) => {
+  try {
+    // Llamamos al endpoint que creó Gonzalo en el Backend
+    // Revisa que BASE_URL esté apuntando a tu backend (ej: localhost:8080)
+    const res = await fetch(`${BASE_URL}/api/mercadopago/create-preference`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      // Le enviamos el carrito tal cual lo espera el Java
+      body: JSON.stringify(items),
+    });
+
+    if (!res.ok) throw new Error(`Error ${res.status}`);
+    return await res.json(); // Retorna algo como { init_point: "https://..." }
+  } catch (err) {
+    console.error("Error creando preferencia MP:", err);
+    return null;
+  }
+};
